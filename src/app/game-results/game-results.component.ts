@@ -26,4 +26,8 @@ export class GameResultsComponent {
       }
     });
   }
+
+  protected trackById(index: number, item: Game): number {
+    return item.id;
+  }
 }

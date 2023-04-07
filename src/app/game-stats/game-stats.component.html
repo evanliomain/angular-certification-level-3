@@ -1,7 +1,10 @@
 <div class="row">
   <div class="col-sm-11">
     <select #teamSelect>
-      <option [value]="team.id" *ngFor="let team of teams$ | async">
+      <option
+        [value]="team.id"
+        *ngFor="let team of teams$ | async; trackBy: trackById"
+      >
         {{ team.full_name }}
       </option>
     </select>
@@ -13,7 +16,7 @@
 <div class="row">
   <app-team-stats
     class="col-sm-4"
-    *ngFor="let team of nbaService.getTrackedTeams()"
+    *ngFor="let team of nbaService.getTrackedTeams(); trackBy: trackById"
     [team]="team"
   >
   </app-team-stats>

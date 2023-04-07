@@ -24,4 +24,8 @@ export class GameStatsComponent {
       this.nbaService.addTrackedTeam(team);
     }
   }
+
+  protected trackById(index: number, item: Team): number {
+    return item.id;
+  }
 }
