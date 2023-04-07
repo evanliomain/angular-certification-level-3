@@ -9,8 +9,9 @@ import { NbaService } from '../nba.service';
   styleUrls: ['./game-stats.component.css'],
 })
 export class GameStatsComponent {
-  teams$: Observable<Team[]>;
-  allTeams: Team[] = [];
+  protected teams$: Observable<Team[]>;
+
+  private allTeams: Team[] = [];
 
   constructor(protected nbaService: NbaService) {
     this.teams$ = nbaService
@@ -18,7 +19,7 @@ export class GameStatsComponent {
       .pipe(tap(data => (this.allTeams = data)));
   }
 
-  trackTeam(teamId: string): void {
+  protected trackTeam(teamId: string): void {
     let team = this.allTeams.find(team => team.id == Number(teamId));
     if (team) {
       this.nbaService.addTrackedTeam(team);

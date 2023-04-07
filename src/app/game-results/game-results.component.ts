@@ -10,8 +10,8 @@ import { NbaService } from '../nba.service';
   styleUrls: ['./game-results.component.css'],
 })
 export class GameResultsComponent {
-  team?: Team;
-  games$?: Observable<Game[]>;
+  protected team?: Team;
+  protected games$?: Observable<Game[]>;
 
   constructor(
     private activatedRoute: ActivatedRoute,

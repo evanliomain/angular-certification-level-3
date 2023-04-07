@@ -12,8 +12,10 @@ export class TeamStatsComponent implements OnInit {
   @Input()
   team!: Team;
 
-  games$!: Observable<Game[]>;
-  stats!: Stats;
+  protected games$!: Observable<Game[]>;
+
+  protected stats!: Stats;
+
   constructor(protected nbaService: NbaService) {}
 
   ngOnInit(): void {

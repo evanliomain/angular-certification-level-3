@@ -17,23 +17,23 @@ export class NbaService {
 
   constructor(private http: HttpClient) {}
 
-  addTrackedTeam(team: Team): void {
+  public addTrackedTeam(team: Team): void {
     if (this.trackedTeams.some(t => t.id == team.id)) {
       return;
     }
     this.trackedTeams.push(team);
   }
 
-  removeTrackedTeam(team: Team): void {
+  public removeTrackedTeam(team: Team): void {
     let index = this.trackedTeams.findIndex(t => t.id == team.id);
     this.trackedTeams.splice(index, 1);
   }
 
-  getTrackedTeams(): Team[] {
+  public getTrackedTeams(): Team[] {
     return this.trackedTeams;
   }
 
-  getAllTeams(): Observable<Team[]> {
+  public getAllTeams(): Observable<Team[]> {
     return this.http
       .get<{ data: Team[] }>(`${this.API_URL}/teams?page=0`, {
         headers: this.headers,
@@ -41,7 +41,7 @@ export class NbaService {
       .pipe(map(res => res.data));
   }
 
-  getLastResults(team: Team, numberOfDays = 12): Observable<Game[]> {
+  public getLastResults(team: Team, numberOfDays = 12): Observable<Game[]> {
     return this.http
       .get<{ meta: any; data: Game[] }>(
         `${this.API_URL}/games?page=0${this.getDaysQueryString(numberOfDays)}`,
@@ -53,7 +53,7 @@ export class NbaService {
       .pipe(map(res => res.data));
   }
 
-  getStatsFromGames(games: Game[], team: Team): Stats {
+  public getStatsFromGames(games: Game[], team: Team): Stats {
     const stats: Stats = {
       wins: 0,
       losses: 0,

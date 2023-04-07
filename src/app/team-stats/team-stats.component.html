@@ -1,4 +1,12 @@
 <div class="card" *ngIf="games$ | async as games">
+  <ul>
+    <li>city: {{ team.city }}</li>
+    <li>conference: {{ team.conference }}</li>
+    <li>division: {{ team.division }}</li>
+    <li>full_name: {{ team.full_name }}</li>
+    <li>name: {{ team.name }}</li>
+  </ul>
+
   <div>
     <h3>
       {{ team.full_name }} [{{ team.abbreviation }}]
