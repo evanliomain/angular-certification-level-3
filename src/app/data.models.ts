@@ -1,3 +1,5 @@
+import { ConferencesEnum } from './data/conferences';
+
 export interface Game {
   id: number;
   date: Date;
@@ -28,6 +30,12 @@ export interface Stats {
   averagePointsScored: number;
   averagePointsConceded: number;
   lastGames: Result[];
+}
+
+export interface Division {
+  id: number;
+  name: string;
+  conference: ConferencesEnum;
 }
 
 export type Result = 'W' | 'L';

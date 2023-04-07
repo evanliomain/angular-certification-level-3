@@ -1,12 +1,36 @@
 <div class="row">
   <div class="col-sm-11">
-    <select #teamSelect>
-      <option
-        [value]="team.id"
-        *ngFor="let team of teams$ | async; trackBy: trackById"
-      >
-        {{ team.full_name }}
+    <select [formControl]="conferenceControl">
+      <option value="">-- Select one of the 2 conferences --</option>
+      <option *ngFor="let conference of conferences" [value]="conference">
+        {{ conference }}ern conference
       </option>
+    </select>
+    <select [formControl]="divisionControl">
+      <ng-container *ngIf="filterDivisions$ | async as filterDivisions">
+        <option value="">
+          -- Select one of the {{ filterDivisions.length }} divisions --
+        </option>
+        <option
+          *ngFor="let division of filterDivisions; trackBy: trackById"
+          [value]="division.name"
+        >
+          {{ division.name }}
+        </option>
+      </ng-container>
+    </select>
+    <select #teamSelect>
+      <ng-container *ngIf="filterTeams$ | async as filterTeams">
+        <option value="">
+          -- Select one of the {{ filterTeams.length }} teams --
+        </option>
+        <option
+          [value]="team.id"
+          *ngFor="let team of filterTeams; trackBy: trackById"
+        >
+          {{ team.full_name }}
+        </option>
+      </ng-container>
     </select>
     <button class="primary" (click)="trackTeam(teamSelect.value)">
       Track team
