@@ -18,6 +18,9 @@ export class NbaService {
   constructor(private http: HttpClient) {}
 
   addTrackedTeam(team: Team): void {
+    if (this.trackedTeams.some(t => t.id == team.id)) {
+      return;
+    }
     this.trackedTeams.push(team);
   }
 
