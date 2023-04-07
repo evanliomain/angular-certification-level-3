@@ -9,14 +9,13 @@ import { NbaService } from '../nba.service';
   styleUrls: ['./team-stats.component.css'],
 })
 export class TeamStatsComponent implements OnInit {
-  @Input()
-  team!: Team;
+  @Input() team!: Team;
 
   protected games$!: Observable<Game[]>;
 
   protected stats!: Stats;
 
-  constructor(protected nbaService: NbaService) {}
+  constructor(private nbaService: NbaService) {}
 
   ngOnInit(): void {
     this.games$ = this.nbaService
@@ -27,5 +26,9 @@ export class TeamStatsComponent implements OnInit {
             (this.stats = this.nbaService.getStatsFromGames(games, this.team))
         )
       );
+  }
+
+  protected remove(): void {
+    this.nbaService.removeTrackedTeam(this.team);
   }
 }

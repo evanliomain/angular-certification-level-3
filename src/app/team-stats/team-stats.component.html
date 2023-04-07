@@ -2,7 +2,14 @@
   <div>
     <h3>
       {{ team.full_name }} [{{ team.abbreviation }}]
-      <span (click)="nbaService.removeTrackedTeam(team)">&times;</span>
+      <button
+        type="button"
+        class="close"
+        (appConfirm)="remove()"
+        confirmMessage="Are you sure you want to remove this item?"
+      >
+        &times;
+      </button>
     </h3>
     <h6>{{ team.conference }}ern conference</h6>
   </div>

@@ -1,0 +1,11 @@
+<p>
+  {{ message }}
+</p>
+<div>
+  <button type="button" role="cancel" tabindex="1" (click)="close.emit(false)">
+    {{ abordLabel }}
+  </button>
+  <button type="button" role="confirm" tabindex="0" (click)="close.emit(true)">
+    {{ confirmLabel }}
+  </button>
+</div>

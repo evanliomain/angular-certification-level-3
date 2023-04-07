@@ -3,9 +3,8 @@
   margin: 5px;
   display: block;
 }
-span{
+button.close {
   float: right;
-  cursor: pointer;
 }
 
 mark.W {
