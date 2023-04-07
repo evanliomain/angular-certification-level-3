@@ -1,4 +1,4 @@
-<div class="card" *ngIf="games$ | async as games">
+<div class="card">
   <div>
     <h3>
       {{ team.full_name }} [{{ team.abbreviation }}]
@@ -17,22 +17,28 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <p>Results of past 12 days:</p>
-        <p>
-          <mark
-            class="tag"
-            *ngFor="let result of stats.lastGames"
-            [class]="result"
-          >
-            {{ result }}
-          </mark>
-        </p>
-        <p>
-          Avg pts scored: <strong>{{ stats.averagePointsScored }}</strong>
-        </p>
-        <p>
-          Avg pts conceded: <strong>{{ stats.averagePointsConceded }}</strong>
-        </p>
+        <p>Results of past {{ numberOfDays }} days:</p>
+
+        <ng-container *ngIf="stats$ | async as stats; else loader">
+          <ng-container *ngIf="statsLoaded; else loader">
+            <p>
+              <mark
+                class="tag"
+                *ngFor="let result of stats.lastGames"
+                [class]="result"
+              >
+                {{ result }}
+              </mark>
+            </p>
+            <p>
+              Avg pts scored: <strong>{{ stats.averagePointsScored }}</strong>
+            </p>
+            <p>
+              Avg pts conceded:
+              <strong>{{ stats.averagePointsConceded }}</strong>
+            </p>
+          </ng-container>
+        </ng-container>
       </div>
       <div class="col-sm-6">
         <img
@@ -47,3 +53,7 @@
     </button>
   </div>
 </div>
+
+<ng-template #loader>
+  <app-loader></app-loader>
+</ng-template>

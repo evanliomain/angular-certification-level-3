@@ -9,6 +9,7 @@ import { ConfirmDirective } from './confirm';
 import { DialogService } from './dialog';
 import { GameResultsComponent } from './game-results/game-results.component';
 import { GameStatsComponent } from './game-stats/game-stats.component';
+import { LoaderComponent } from './loader';
 import { TeamStatsComponent } from './team-stats/team-stats.component';
 
 @NgModule({
@@ -26,6 +27,7 @@ import { TeamStatsComponent } from './team-stats/team-stats.component';
     ReactiveFormsModule,
     ConfirmDirective,
     CommonModule,
+    LoaderComponent,
   ],
   providers: [DialogService],
   bootstrap: [AppComponent],

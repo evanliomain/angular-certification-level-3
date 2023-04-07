@@ -28,6 +28,10 @@ export class GameStatsComponent {
   protected conferenceControl = new FormControl('');
   protected divisionControl = new FormControl('');
 
+  protected defaultNbDay = 12;
+  protected days = [6, 12, 20, 50, 100];
+  protected nbDaysControl = new FormControl(this.defaultNbDay);
+
   private allTeams: Team[] = [];
 
   constructor(protected nbaService: NbaService) {

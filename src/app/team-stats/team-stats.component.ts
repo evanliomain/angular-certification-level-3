@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, ReplaySubject, map, switchMap, tap } from 'rxjs';
 import { Game, Stats, Team } from '../data.models';
 import { NbaService } from '../nba.service';
+import { skipNill } from '../operator';
 
 @Component({
   selector: 'app-team-stats',
@@ -9,21 +10,35 @@ import { NbaService } from '../nba.service';
   styleUrls: ['./team-stats.component.css'],
 })
 export class TeamStatsComponent implements OnInit {
+  private nbDays$ = new ReplaySubject<number>();
+
+  protected numberOfDays!: number;
+
+  protected statsLoaded = false;
+
   @Input() team!: Team;
 
-  protected games$!: Observable<Game[]>;
+  @Input() set nbDays(n: number) {
+    this.nbDays$.next(n);
+    this.numberOfDays = n;
+  }
 
-  protected stats!: Stats;
+  protected stats$!: Observable<Stats>;
 
   constructor(private nbaService: NbaService) {}
 
   ngOnInit(): void {
-    this.games$ = this.nbaService
-      .getLastResults(this.team, 12)
+    this.stats$ = this.nbDays$
+      .pipe(skipNill())
+      .pipe(tap(() => (this.statsLoaded = false)))
       .pipe(
-        tap(
-          games =>
-            (this.stats = this.nbaService.getStatsFromGames(games, this.team))
+        switchMap(nbDays =>
+          this.nbaService
+            .getLastResults(this.team, nbDays)
+            .pipe(
+              map(games => this.nbaService.getStatsFromGames(games, this.team))
+            )
+            .pipe(tap(() => (this.statsLoaded = true)))
         )
       );
   }

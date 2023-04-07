@@ -35,6 +35,12 @@
     <button class="primary" (click)="trackTeam(teamSelect.value)">
       Track team
     </button>
+    <select [formControl]="nbDaysControl">
+      <option *ngFor="let nbDays of days" [value]="nbDays">
+        {{ nbDays }}
+      </option>
+    </select>
+    <span>days</span>
   </div>
 </div>
 <div class="row">
@@ -42,6 +48,7 @@
     class="col-sm-4"
     *ngFor="let team of nbaService.getTrackedTeams(); trackBy: trackById"
     [team]="team"
+    [nbDays]="nbDaysControl.value ?? defaultNbDay"
   >
   </app-team-stats>
 </div>
