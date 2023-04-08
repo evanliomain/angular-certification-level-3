@@ -41,7 +41,11 @@ export class NbaService {
       .pipe(map(res => res.data));
   }
 
-  public getLastResults(team: Team, numberOfDays = 12): Observable<Game[]> {
+  public getLastResults(
+    team: Team,
+    numberOfDays = this.nbDays
+  ): Observable<Game[]> {
+    this.saveProperty('numberOfDays', numberOfDays);
     return this.http
       .get<{ meta: any; data: Game[] }>(
         `${this.API_URL}/games?page=0${this.getDaysQueryString(numberOfDays)}`,
@@ -78,7 +82,11 @@ export class NbaService {
     return stats;
   }
 
-  private getDaysQueryString(nbOfDays = 12): string {
+  public get nbDays(): number {
+    return this.getProperty('numberOfDays', 12);
+  }
+
+  private getDaysQueryString(nbOfDays = this.nbDays): string {
     let qs = '';
     for (let i = 1; i < nbOfDays; i++) {
       let date = format(subDays(new Date(), i), 'yyyy-MM-dd');
@@ -114,5 +122,22 @@ export class NbaService {
       }
     }
     return stats;
+  }
+
+  private saveProperty<T>(name: string, value: T): void {
+    localStorage.setItem(name, JSON.stringify(value, null, 0));
+  }
+
+  private getProperty<T>(name: string, defaultValue: T): T {
+    const item = localStorage.getItem(name);
+    return this.parseStoredValue(item, defaultValue);
+  }
+
+  private parseStoredValue<T>(value: string | null, defaultValue: T): T {
+    try {
+      return null !== value ? JSON.parse(value) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
   }
 }

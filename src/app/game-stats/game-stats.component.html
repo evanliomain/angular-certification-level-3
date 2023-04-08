@@ -46,7 +46,7 @@
 <div class="row">
   <app-team-stats
     class="col-sm-4"
-    *ngFor="let team of nbaService.getTrackedTeams(); trackBy: trackById"
+    *ngFor="let team of trackedTeams; trackBy: trackById"
     [team]="team"
     [nbDays]="nbDaysControl.value ?? defaultNbDay"
   >

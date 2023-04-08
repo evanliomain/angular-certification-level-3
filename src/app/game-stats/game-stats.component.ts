@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   Observable,
@@ -19,61 +19,58 @@ import { NbaService } from '../nba.service';
   styleUrls: ['./game-stats.component.css'],
 })
 export class GameStatsComponent {
-  protected filterTeams$: Observable<Team[]>;
+  private nbaService = inject(NbaService);
 
-  protected filterDivisions$: Observable<Division[]>;
+  private teams$ = this.nbaService
+    .getAllTeams()
+    .pipe(tap(data => (this.allTeams = data)));
+
+  protected trackedTeams = this.nbaService.getTrackedTeams();
 
   protected conferences = CONFERENCES;
 
   protected conferenceControl = new FormControl('');
   protected divisionControl = new FormControl('');
 
-  protected defaultNbDay = 12;
+  protected defaultNbDay = this.nbaService.nbDays;
   protected days = [6, 12, 20, 50, 100];
   protected nbDaysControl = new FormControl(this.defaultNbDay);
 
   private allTeams: Team[] = [];
 
-  constructor(protected nbaService: NbaService) {
-    const teams$ = nbaService
-      .getAllTeams()
-      .pipe(tap(data => (this.allTeams = data)));
+  protected filterTeams$: Observable<Team[]> = combineLatest([
+    this.teams$.pipe(shareReplay()),
+    this.conferenceControl.valueChanges.pipe(startWith('')),
+    this.divisionControl.valueChanges.pipe(startWith('')),
+  ]).pipe(
+    map(([teams, conference, division]) => {
+      let filterTeams = [...teams];
+      if ('' !== conference) {
+        filterTeams = filterTeams.filter(
+          team => team.conference === conference
+        );
+      }
+      if ('' !== division) {
+        filterTeams = filterTeams.filter(team => team.division === division);
+      }
 
-    this.filterTeams$ = combineLatest([
-      teams$.pipe(shareReplay()),
-      this.conferenceControl.valueChanges.pipe(startWith('')),
-      this.divisionControl.valueChanges.pipe(startWith('')),
-    ]).pipe(
-      map(([teams, conference, division]) => {
-        let filterTeams = [...teams];
+      return filterTeams;
+    })
+  );
+
+  protected filterDivisions$: Observable<Division[]> =
+    this.conferenceControl.valueChanges.pipe(startWith('')).pipe(
+      map(conference => {
+        let filterDivisions = [...DIVISIONS];
         if ('' !== conference) {
-          filterTeams = filterTeams.filter(
-            team => team.conference === conference
+          filterDivisions = filterDivisions.filter(
+            division => division.conference === conference
           );
         }
-        if ('' !== division) {
-          filterTeams = filterTeams.filter(team => team.division === division);
-        }
 
-        return filterTeams;
+        return filterDivisions;
       })
     );
-
-    this.filterDivisions$ = this.conferenceControl.valueChanges
-      .pipe(startWith(''))
-      .pipe(
-        map(conference => {
-          let filterDivisions = [...DIVISIONS];
-          if ('' !== conference) {
-            filterDivisions = filterDivisions.filter(
-              division => division.conference === conference
-            );
-          }
-
-          return filterDivisions;
-        })
-      );
-  }
 
   protected trackTeam(teamId: string): void {
     let team = this.allTeams.find(team => team.id == Number(teamId));

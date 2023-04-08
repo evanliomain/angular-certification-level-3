@@ -13,6 +13,8 @@ export class GameResultsComponent {
   protected team?: Team;
   protected games$?: Observable<Game[]>;
 
+  protected nbDays = this.nbaService.nbDays;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private nbaService: NbaService
