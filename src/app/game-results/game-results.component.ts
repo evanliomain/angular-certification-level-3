@@ -1,15 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription, map, switchMap, tap } from 'rxjs';
 import { Game, Team } from '../data.models';
 import { NbaService } from '../nba.service';
+import { skipNill } from '../operator';
 
 @Component({
   selector: 'app-game-results',
   templateUrl: './game-results.component.html',
   styleUrls: ['./game-results.component.css'],
 })
-export class GameResultsComponent {
+export class GameResultsComponent implements OnDestroy {
+  private subscription!: Subscription;
+
   protected team?: Team;
   protected games$?: Observable<Game[]>;
 
@@ -19,14 +22,24 @@ export class GameResultsComponent {
     private activatedRoute: ActivatedRoute,
     private nbaService: NbaService
   ) {
-    this.activatedRoute.paramMap.subscribe(paramMap => {
-      this.team = this.nbaService
-        .getTrackedTeams()
-        .find(team => team.abbreviation === paramMap.get('teamAbbr'));
-      if (this.team) {
-        this.games$ = this.nbaService.getLastResults(this.team);
-      }
-    });
+    this.subscription = this.activatedRoute.paramMap
+      .pipe(map(paramMap => paramMap.get('teamAbbr')))
+      .pipe(skipNill())
+      .pipe(
+        switchMap(teamAbbr => this.nbaService.getTeamByAbbreviation(teamAbbr))
+      )
+      .pipe(tap(team => (this.team = team)))
+      .pipe(
+        tap(team => {
+          if (team) {
+            this.games$ = this.nbaService.getLastResults(team);
+          }
+        })
+      )
+      .subscribe();
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   protected trackById(index: number, item: Game): number {

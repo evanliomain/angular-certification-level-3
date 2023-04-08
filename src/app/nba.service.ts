@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { format, subDays } from 'date-fns';
-import { Observable, map } from 'rxjs';
+import { Observable, ReplaySubject, map, take, tap } from 'rxjs';
 import { Game, Stats, Team } from './data.models';
 
 @Injectable({
@@ -15,7 +15,18 @@ export class NbaService {
   private API_URL = 'https://free-nba.p.rapidapi.com';
   trackedTeams: Team[] = [];
 
-  constructor(private http: HttpClient) {}
+  private allTeams$: ReplaySubject<Team[]> = new ReplaySubject();
+
+  constructor(private http: HttpClient) {
+    this.http
+      .get<{ data: Team[] }>(`${this.API_URL}/teams?page=0`, {
+        headers: this.headers,
+      })
+      .pipe(map(res => res.data))
+      .pipe(tap(teams => this.allTeams$.next(teams)))
+      .pipe(take(1))
+      .subscribe();
+  }
 
   public addTrackedTeam(team: Team): void {
     if (this.trackedTeams.some(t => t.id == team.id)) {
@@ -33,12 +44,16 @@ export class NbaService {
     return this.trackedTeams;
   }
 
+  public getTeamByAbbreviation(
+    abbreviation: string
+  ): Observable<Team | undefined> {
+    return this.allTeams$.pipe(
+      map(teams => teams.find(team => team.abbreviation === abbreviation))
+    );
+  }
+
   public getAllTeams(): Observable<Team[]> {
-    return this.http
-      .get<{ data: Team[] }>(`${this.API_URL}/teams?page=0`, {
-        headers: this.headers,
-      })
-      .pipe(map(res => res.data));
+    return this.allTeams$.asObservable();
   }
 
   public getLastResults(
