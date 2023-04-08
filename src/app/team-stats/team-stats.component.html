@@ -17,7 +17,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <p>Results of past {{ numberOfDays }} days:</p>
+        <p>Results of past {{ nbDays$ | async }} days:</p>
 
         <ng-container *ngIf="stats$ | async as stats; else loader">
           <ng-container *ngIf="statsLoaded; else loader">

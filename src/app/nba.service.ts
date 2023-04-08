@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { format, subDays } from 'date-fns';
-import { Observable, ReplaySubject, map, take, tap } from 'rxjs';
-import { Game, Stats, Team } from './data.models';
+import { Injectable, inject } from '@angular/core';
+import { Observable, map, take, tap } from 'rxjs';
+import { ApiResult, Game, Team } from './data.models';
+import { AllTeamsStore, NB_DAYS } from './store';
+import { getDaysQueryString } from './utils';
 
 @Injectable({
   providedIn: 'root',
@@ -13,146 +14,38 @@ export class NbaService {
     'X-RapidAPI-Host': 'free-nba.p.rapidapi.com',
   };
   private API_URL = 'https://free-nba.p.rapidapi.com';
-  trackedTeams: Team[] = [];
 
-  private allTeams$: ReplaySubject<Team[]> = new ReplaySubject();
+  private nbDaysStore = inject(NB_DAYS);
+  private allTeamsStore = inject(AllTeamsStore);
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
+  public initialize(): void {
     this.http
-      .get<{ data: Team[] }>(`${this.API_URL}/teams?page=0`, {
+      .get<ApiResult<Team>>(`${this.API_URL}/teams?page=0`, {
         headers: this.headers,
       })
       .pipe(map(res => res.data))
-      .pipe(tap(teams => this.allTeams$.next(teams)))
+      .pipe(tap(teams => (this.allTeamsStore.value = teams)))
       .pipe(take(1))
       .subscribe();
   }
 
-  public addTrackedTeam(team: Team): void {
-    if (this.trackedTeams.some(t => t.id == team.id)) {
-      return;
-    }
-    this.trackedTeams.push(team);
-  }
-
-  public removeTrackedTeam(team: Team): void {
-    let index = this.trackedTeams.findIndex(t => t.id == team.id);
-    this.trackedTeams.splice(index, 1);
-  }
-
-  public getTrackedTeams(): Team[] {
-    return this.trackedTeams;
-  }
-
-  public getTeamByAbbreviation(
-    abbreviation: string
-  ): Observable<Team | undefined> {
-    return this.allTeams$.pipe(
-      map(teams => teams.find(team => team.abbreviation === abbreviation))
-    );
-  }
-
-  public getAllTeams(): Observable<Team[]> {
-    return this.allTeams$.asObservable();
-  }
-
   public getLastResults(
     team: Team,
-    numberOfDays = this.nbDays
+    numberOfDays = this.nbDaysStore.value
   ): Observable<Game[]> {
-    this.saveProperty('numberOfDays', numberOfDays);
+    this.nbDaysStore.value = numberOfDays;
+
     return this.http
       .get<{ meta: any; data: Game[] }>(
-        `${this.API_URL}/games?page=0${this.getDaysQueryString(numberOfDays)}`,
+        `${this.API_URL}/games?page=0${getDaysQueryString(
+          numberOfDays ?? this.nbDaysStore.value
+        )}`,
         {
           headers: this.headers,
           params: { per_page: numberOfDays, 'team_ids[]': '' + team.id },
         }
       )
       .pipe(map(res => res.data));
-  }
-
-  public getStatsFromGames(games: Game[], team: Team): Stats {
-    const stats: Stats = {
-      wins: 0,
-      losses: 0,
-      averagePointsScored: 0,
-      averagePointsConceded: 0,
-      lastGames: [],
-    };
-    games.forEach(game => {
-      const gameStats = this.getSingleGameStats(team, game);
-      stats.wins += gameStats.wins;
-      stats.losses += gameStats.losses;
-      stats.averagePointsConceded += gameStats.averagePointsConceded;
-      stats.averagePointsScored += gameStats.averagePointsScored;
-      stats.lastGames.push(gameStats.wins == 1 ? 'W' : 'L');
-    });
-    stats.averagePointsScored = Math.round(
-      stats.averagePointsScored / games.length
-    );
-    stats.averagePointsConceded = Math.round(
-      stats.averagePointsConceded / games.length
-    );
-    return stats;
-  }
-
-  public get nbDays(): number {
-    return this.getProperty('numberOfDays', 12);
-  }
-
-  private getDaysQueryString(nbOfDays = this.nbDays): string {
-    let qs = '';
-    for (let i = 1; i < nbOfDays; i++) {
-      let date = format(subDays(new Date(), i), 'yyyy-MM-dd');
-      qs = qs.concat('&dates[]=' + date);
-    }
-    return qs;
-  }
-
-  private getSingleGameStats(team: Team, game: Game): Stats {
-    const stats: Stats = {
-      wins: 0,
-      losses: 0,
-      averagePointsScored: 0,
-      averagePointsConceded: 0,
-      lastGames: [],
-    };
-    if (game.home_team.id === team.id) {
-      stats.averagePointsScored = game.home_team_score;
-      stats.averagePointsConceded = game.visitor_team_score;
-      if (game.home_team_score > game.visitor_team_score) {
-        stats.wins += 1;
-      } else {
-        stats.losses += 1;
-      }
-    }
-    if (game.visitor_team.id === team.id) {
-      stats.averagePointsScored = game.visitor_team_score;
-      stats.averagePointsConceded = game.home_team_score;
-      if (game.visitor_team_score > game.home_team_score) {
-        stats.wins = 1;
-      } else {
-        stats.losses = 1;
-      }
-    }
-    return stats;
-  }
-
-  private saveProperty<T>(name: string, value: T): void {
-    localStorage.setItem(name, JSON.stringify(value, null, 0));
-  }
-
-  private getProperty<T>(name: string, defaultValue: T): T {
-    const item = localStorage.getItem(name);
-    return this.parseStoredValue(item, defaultValue);
-  }
-
-  private parseStoredValue<T>(value: string | null, defaultValue: T): T {
-    try {
-      return null !== value ? JSON.parse(value) : defaultValue;
-    } catch {
-      return defaultValue;
-    }
   }
 }

@@ -10,6 +10,7 @@ import { DialogService } from './dialog';
 import { GameResultsComponent } from './game-results/game-results.component';
 import { GameStatsComponent } from './game-stats/game-stats.component';
 import { LoaderComponent } from './loader';
+import { StoreModule } from './store';
 import { TeamStatsComponent } from './team-stats/team-stats.component';
 
 @NgModule({
@@ -28,6 +29,7 @@ import { TeamStatsComponent } from './team-stats/team-stats.component';
     ConfirmDirective,
     CommonModule,
     LoaderComponent,
+    StoreModule,
   ],
   providers: [DialogService],
   bootstrap: [AppComponent],

@@ -24,6 +24,19 @@ export interface Team {
   name: string;
 }
 
+export interface Meta {
+  total_pages: number;
+  current_page: number;
+  next_page: number;
+  per_page: number;
+  total_count: number;
+}
+
+export interface ApiResult<T> {
+  data: T[];
+  meta: Meta;
+}
+
 export interface Stats {
   wins: number;
   losses: number;

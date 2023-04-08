@@ -25,7 +25,7 @@
           -- Select one of the {{ filterTeams.length }} teams --
         </option>
         <option
-          [value]="team.id"
+          [value]="team.abbreviation"
           *ngFor="let team of filterTeams; trackBy: trackById"
         >
           {{ team.full_name }}
@@ -46,9 +46,8 @@
 <div class="row">
   <app-team-stats
     class="col-sm-4"
-    *ngFor="let team of trackedTeams; trackBy: trackById"
+    *ngFor="let team of trackedTeams$ | async; trackBy: trackById"
     [team]="team"
-    [nbDays]="nbDaysControl.value ?? defaultNbDay"
   >
   </app-team-stats>
 </div>

@@ -1,46 +1,33 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription, map, switchMap, tap } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
 import { Game, Team } from '../data.models';
 import { NbaService } from '../nba.service';
 import { skipNill } from '../operator';
+import { AllTeamsStore, NB_DAYS } from '../store';
 
 @Component({
   selector: 'app-game-results',
   templateUrl: './game-results.component.html',
   styleUrls: ['./game-results.component.css'],
 })
-export class GameResultsComponent implements OnDestroy {
-  private subscription!: Subscription;
+export class GameResultsComponent {
+  private nbDaysStore = inject(NB_DAYS);
+  private allTeamsStore = inject(AllTeamsStore);
+  private activatedRoute = inject(ActivatedRoute);
+  private nbaService = inject(NbaService);
 
-  protected team?: Team;
-  protected games$?: Observable<Game[]>;
+  protected team$: Observable<Team> = this.activatedRoute.paramMap
+    .pipe(map(paramMap => paramMap.get('teamAbbr')))
+    .pipe(skipNill())
+    .pipe(switchMap(teamAbbr => this.allTeamsStore.byAbbreviation(teamAbbr)))
+    .pipe(skipNill());
 
-  protected nbDays = this.nbaService.nbDays;
+  protected games$?: Observable<Game[]> = this.team$.pipe(
+    switchMap(team => this.nbaService.getLastResults(team))
+  );
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private nbaService: NbaService
-  ) {
-    this.subscription = this.activatedRoute.paramMap
-      .pipe(map(paramMap => paramMap.get('teamAbbr')))
-      .pipe(skipNill())
-      .pipe(
-        switchMap(teamAbbr => this.nbaService.getTeamByAbbreviation(teamAbbr))
-      )
-      .pipe(tap(team => (this.team = team)))
-      .pipe(
-        tap(team => {
-          if (team) {
-            this.games$ = this.nbaService.getLastResults(team);
-          }
-        })
-      )
-      .subscribe();
-  }
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+  protected nbDays = this.nbDaysStore.value;
 
   protected trackById(index: number, item: Game): number {
     return item.id;

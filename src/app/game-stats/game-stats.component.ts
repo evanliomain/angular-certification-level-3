@@ -1,45 +1,46 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   Observable,
+  Subscription,
   combineLatest,
   map,
-  shareReplay,
   startWith,
   tap,
 } from 'rxjs';
 import { Division, Team } from '../data.models';
 import { CONFERENCES } from '../data/conferences';
 import { DIVISIONS } from '../data/divisions';
-import { NbaService } from '../nba.service';
+import { skipNill } from '../operator';
+import { AllTeamsStore, NB_DAYS, TRACKED_TEAMS } from '../store';
 
 @Component({
   selector: 'app-game-stats',
   templateUrl: './game-stats.component.html',
   styleUrls: ['./game-stats.component.css'],
 })
-export class GameStatsComponent {
-  private nbaService = inject(NbaService);
+export class GameStatsComponent implements OnInit, OnDestroy {
+  private subscription!: Subscription;
 
-  private teams$ = this.nbaService
-    .getAllTeams()
-    .pipe(tap(data => (this.allTeams = data)));
+  private trackedTeams = inject(TRACKED_TEAMS);
+  private nbDaysStore = inject(NB_DAYS);
+  private allTeamsStore = inject(AllTeamsStore);
 
-  protected trackedTeams = this.nbaService.getTrackedTeams();
+  private teams$ = this.allTeamsStore.value$;
+
+  protected trackedTeams$ = this.allTeamsStore.tracked$;
 
   protected conferences = CONFERENCES;
 
   protected conferenceControl = new FormControl('');
   protected divisionControl = new FormControl('');
 
-  protected defaultNbDay = this.nbaService.nbDays;
+  protected defaultNbDay = this.nbDaysStore.value;
   protected days = [6, 12, 20, 50, 100];
   protected nbDaysControl = new FormControl(this.defaultNbDay);
 
-  private allTeams: Team[] = [];
-
   protected filterTeams$: Observable<Team[]> = combineLatest([
-    this.teams$.pipe(shareReplay()),
+    this.teams$,
     this.conferenceControl.valueChanges.pipe(startWith('')),
     this.divisionControl.valueChanges.pipe(startWith('')),
   ]).pipe(
@@ -72,17 +73,27 @@ export class GameStatsComponent {
       })
     );
 
-  protected trackTeam(teamId: string): void {
-    let team = this.allTeams.find(team => team.id == Number(teamId));
-    if (team) {
-      this.nbaService.addTrackedTeam(team);
+  ngOnInit(): void {
+    this.subscription = this.nbDaysControl.valueChanges
+      .pipe(skipNill())
+      .pipe(tap(value => (this.nbDaysStore.value = value)))
+      .subscribe();
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  protected trackTeam(teamAbbr: string): void {
+    if ('' === teamAbbr) {
+      return;
     }
+    this.trackedTeams.add(teamAbbr);
   }
 
   protected trackById<T extends { id: number }>(
     index: number,
     item: T
   ): number {
-    return item.id;
+    return item?.id;
   }
 }
