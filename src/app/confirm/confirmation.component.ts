@@ -11,7 +11,8 @@ import { DialogComponent } from '../dialog';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-confirmation',
-  templateUrl: './confirmation.component.html'
+  templateUrl: './confirmation.component.html',
+  styleUrls: ['./confirmation.component.css'],
 })
 export class ConfirmationComponent implements DialogComponent {
   @Input() message!: string;

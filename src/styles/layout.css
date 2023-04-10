@@ -1,0 +1,27 @@
+.auto-grid {
+  --min-column-size: 25rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.auto-grid > * {
+  max-width: var(--min-column-size);
+}
+
+@media screen and (max-width: 1073px) {
+  .auto-grid > * {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media screen and (min-width: 1073px) {
+  .auto-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(var(--min-column-size), 100%), 1fr)
+    );
+  }
+}

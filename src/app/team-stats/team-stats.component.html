@@ -1,57 +1,48 @@
-<div class="card">
+<div class="content">
   <div>
-    <h3>
-      {{ team.full_name }} [{{ team.abbreviation }}]
-      <button
-        type="button"
-        class="close"
-        (appConfirm)="remove()"
-        confirmMessage="Are you sure you want to remove this item?"
-      >
-        &times;
-      </button>
-    </h3>
-    <h6>{{ team.conference }}ern conference</h6>
+    <h3>{{ team.full_name }} [{{ team.abbreviation }}]</h3>
+    <h4>{{ team.conference }}ern conference</h4>
   </div>
-  <hr />
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-6">
-        <p>Results of past {{ nbDays$ | async }} days:</p>
+  <figure>
+    <img src="https://interstate21.com/nba-logos/{{ team.abbreviation }}.png" />
+  </figure>
 
-        <ng-container *ngIf="stats$ | async as stats; else loader">
-          <ng-container *ngIf="statsLoaded; else loader">
-            <p>
-              <mark
-                class="tag"
-                *ngFor="let result of stats.lastGames"
-                [class]="result"
-              >
-                {{ result }}
-              </mark>
-            </p>
-            <p>
-              Avg pts scored: <strong>{{ stats.averagePointsScored }}</strong>
-            </p>
-            <p>
-              Avg pts conceded:
-              <strong>{{ stats.averagePointsConceded }}</strong>
-            </p>
-          </ng-container>
-        </ng-container>
-      </div>
-      <div class="col-sm-6">
-        <img
-          src="https://interstate21.com/nba-logos/{{ team.abbreviation }}.png"
-        />
-      </div>
-    </div>
-  </div>
-  <div>
-    <button class="tertiary" [routerLink]="'results/' + team.abbreviation">
-      See game results >>
-    </button>
-  </div>
+  <p>Results of past {{ nbDays$ | async }} days:</p>
+
+  <ng-container *ngIf="stats$ | async as stats; else loader">
+    <ng-container *ngIf="statsLoaded; else loader">
+      <p class="marks">
+        <mark
+          *ngFor="let result of stats.lastGames"
+          [class]="result"
+          [attr.aria-Label]="'L' === result ? 'Loose' : 'Win'"
+        >
+          {{ result }}
+        </mark>
+      </p>
+      <p>
+        Average points scored: <strong>{{ stats.averagePointsScored }}</strong>
+      </p>
+      <p>
+        Average points conceded:
+        <strong>{{ stats.averagePointsConceded }}</strong>
+      </p>
+    </ng-container>
+  </ng-container>
+  <button
+    type="button"
+    class="close"
+    (appConfirm)="remove()"
+    confirmMessage="Are you sure you want to remove this item?"
+    [attr.aria-label]="'Remove tracking of ' + team.full_name"
+  ></button>
+  <button
+    type="button"
+    class="link"
+    [routerLink]="'results/' + team.abbreviation"
+  >
+    See game results
+  </button>
 </div>
 
 <ng-template #loader>

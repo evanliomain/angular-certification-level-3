@@ -1,29 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
-@import '../node_modules/mini.css/dist/mini-default.min.css';
 
-.dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-}
+@import './styles/layout.css';
+@import './styles/dialog.css';
+@import './styles/basketball-button.css';
+@import './styles/link-button.css';
 
-.dialog button {
-  margin-top: 10px;
-  transition: background-color 100ms ease;
-}
-.dialog button[role='confirm'] {
-}
-.dialog button[role='cancel'] {
-  background-color: transparent;
-}
-
-.dialog button[role='confirm']:hover,
-.dialog button[role='cancel']:hover {
-  background-color: lightgrey;
+body {
+  background-color: hsl(220, 7%, 24%);
+  color: white;
 }

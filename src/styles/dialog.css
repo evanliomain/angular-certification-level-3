@@ -1,0 +1,88 @@
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  color: black;
+  background-color: rgba(0, 0, 0, 0.7);
+
+  animation: backdrop 300ms linear alternate;
+}
+.dialog-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  animation: fadin 300ms linear alternate;
+}
+
+.dialog.dialog-fadeout {
+  box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
+  animation: backdropOut 300ms linear;
+}
+.dialog.dialog-fadeout > .dialog-content {
+  opacity: 0;
+  animation: fadout 300ms linear;
+}
+
+.dialog button {
+  transition: background-color 100ms ease;
+  border: none;
+  border-radius: 5px;
+  padding: 1rem;
+  cursor: pointer;
+}
+.dialog button[role='confirm'] {
+}
+.dialog button[role='cancel'] {
+  background-color: transparent;
+}
+
+.dialog button[role='confirm']:hover,
+.dialog button[role='cancel']:hover {
+  background-color: lightgrey;
+}
+
+@keyframes backdrop {
+  0% {
+    box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+@keyframes backdropOut {
+  0%, 25% {
+    box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 10px 100vw rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes fadin {
+  0%,
+  25% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadout {
+  0% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}

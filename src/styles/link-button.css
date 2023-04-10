@@ -1,0 +1,70 @@
+@property --color-1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffa500;
+}
+@property --color-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ff4500;
+}
+
+.link {
+  color: white;
+  background-image: linear-gradient(90deg, var(--color-1), var(--color-2));
+  border: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 2rem;
+  transition: --color-1 300ms ease, --color-2 500ms 300ms ease;
+
+  position: relative;
+}
+.link::before,
+.link::after {
+  --angle: 45deg;
+  --orientation: 1;
+  --x: 0px;
+  --direction: 1;
+
+  content: '';
+  background-color: white;
+  height: 3px;
+  width: 20px;
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform-origin: right;
+  border-radius: 10px;
+
+  transition: transform 300ms ease;
+
+  transform: translateX(calc(var(--direction) * var(--x)))
+    rotateZ(calc(var(--angle) * var(--orientation)));
+}
+.link::before {
+}
+.link::after {
+  --orientation: -1;
+}
+
+.link:hover,
+.link:focus-visible {
+  --color-1: #d12400;
+  --color-2: #ffa500;
+}
+
+.link:hover::before,
+.link:focus-visible::before,
+.link:hover::after,
+.link:focus-visible::after {
+  --angle: 30deg;
+  --x: 25px;
+}
+
+.link.link-reverse::before,
+.link.link-reverse::after {
+  left: 4rem;
+  transform-origin: left;
+  --direction: -1;
+}

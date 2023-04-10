@@ -5,7 +5,7 @@ import {
   Type,
   ViewContainerRef,
 } from '@angular/core';
-import { Observable, Subject, map, tap } from 'rxjs';
+import { Observable, Subject, delay, tap } from 'rxjs';
 import { DialogComponent } from './dialog-component.interface';
 
 @Injectable({
@@ -40,7 +40,15 @@ export class DialogService {
 
     const dialog = this.renderer.createElement('div');
     this.renderer.addClass(dialog, 'dialog');
-    this.renderer.appendChild(dialog, componentRef.location.nativeElement);
+
+    const dialogContent = this.renderer.createElement('div');
+    this.renderer.addClass(dialogContent, 'dialog-content');
+    this.renderer.appendChild(dialog, dialogContent);
+
+    this.renderer.appendChild(
+      dialogContent,
+      componentRef.location.nativeElement
+    );
 
     // Add input to the component
     Object.entries(options?.data ?? {}).forEach(([key, value]) => {
@@ -50,13 +58,18 @@ export class DialogService {
     // React to the close output, defined by DialogComponent interface
     const closeSubscription = componentRef.instance.close
       .pipe(
-        map(result => {
+        tap(() => {
+          this.renderer.addClass(dialog, 'dialog-fadeout');
+        })
+    )
+      .pipe(delay(300))
+      .pipe(
+        tap(() => {
           this.renderer.removeChild(document.body, dialog);
           componentRef.destroy();
-
-          return dialogReturn.next(result);
         })
       )
+      .pipe(tap(result => dialogReturn.next(result)))
       .subscribe();
 
     this.renderer.appendChild(document.body, dialog);

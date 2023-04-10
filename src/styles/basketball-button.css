@@ -1,0 +1,75 @@
+@property --bcolor-1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffa500;
+}
+@property --bcolor-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ff4500;
+}
+@property --bcolor-3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #d12400;
+}
+
+button.basketball-button {
+  --size: 75px;
+  position: relative;
+  display: inline-block;
+  width: var(--size);
+  height: var(--size);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background-image: radial-gradient(
+    ellipse at center,
+    var(--bcolor-1) 0%,
+    var(--bcolor-2) 50%,
+    var(--bcolor-3) 70%
+  );
+  cursor: pointer;
+
+  overflow: hidden;
+
+  font-size: 0.7rem;
+  font-weight: bold;
+
+  transform: rotateX(0deg) scale(1);
+  transition: --bcolor-1 300ms ease, --bcolor-2 300ms ease,
+    --bcolor-3 300ms ease, transform 300ms ease;
+}
+
+.basketball-button::before {
+  --size: 90px;
+  content: '';
+  position: absolute;
+  top: 13px;
+  left: -10px;
+  width: var(--size);
+  height: var(--size);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.basketball-button::after {
+  --size: 90px;
+  content: '';
+  position: absolute;
+  top: -32px;
+  left: -10px;
+  width: var(--size);
+  height: var(--size);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.basketball-button:hover,
+.basketball-button:focus-visible {
+  transform: scale(1.2);
+
+  --bcolor-1: #ffa500;
+  --bcolor-2: #ffa500;
+  --bcolor-3: #ff4500;
+}
