@@ -4,6 +4,7 @@
 @import './styles/dialog.css';
 @import './styles/basketball-button.css';
 @import './styles/link-button.css';
+@import './styles/animation-card.css';
 
 body {
   background-color: hsl(220, 7%, 24%);

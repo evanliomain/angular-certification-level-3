@@ -5,11 +5,13 @@ import { NbaService } from '../nba.service';
 import { skipNill } from '../operator';
 import { NB_DAYS, TRACKED_TEAMS } from '../store';
 import { getStatsFromGames } from '../utils';
+import { AnimationCardDirective } from '../animation-card.directive';
 
 @Component({
   selector: 'app-team-stats',
   templateUrl: './team-stats.component.html',
   styleUrls: ['./team-stats.component.css'],
+  hostDirectives:[AnimationCardDirective]
 })
 export class TeamStatsComponent {
   private trackedTeams = inject(TRACKED_TEAMS);

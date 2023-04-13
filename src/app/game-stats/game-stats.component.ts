@@ -36,7 +36,7 @@ export class GameStatsComponent implements OnInit, OnDestroy {
   protected divisionControl = new FormControl('');
 
   protected defaultNbDay = this.nbDaysStore.value;
-  protected days = [6, 12, 20, 50, 100];
+  protected days = [6, 12, 20];
   protected nbDaysControl = new FormControl(this.defaultNbDay);
 
   protected filterTeams$: Observable<Team[]> = combineLatest([
